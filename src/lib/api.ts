@@ -50,7 +50,7 @@ function messageForStatus(status: number, fallback?: string) {
 
 async function request<T>(
   path: string,
-  init?: RequestInit & { body?: unknown },
+  init?: Omit<RequestInit, "body"> & { body?: unknown },
 ): Promise<T> {
   let res: Response;
   try {
