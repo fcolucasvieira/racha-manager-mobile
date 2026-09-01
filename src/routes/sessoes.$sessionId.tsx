@@ -73,7 +73,7 @@ function SessionDetail() {
   });
 
   const finishMatch = useMutation({
-    mutationFn: (input: { resultType: "WINNER" | "DRAW"; winnerTeamNumber?: number }) =>
+    mutationFn: (input: { resultType: "WINNER" | "DRAW"; winnerTeamNumber?: number | undefined }) =>
       api.finishMatch(sessionId, input.resultType, input.winnerTeamNumber),
     onSuccess: (_data, input) => {
       toast.success(
