@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JogadoresRouteImport } from './routes/jogadores'
+import { Route as SessoesRouteImport } from './routes/sessoes'
 import { Route as SessoesIndexRouteImport } from './routes/sessoes.index'
 import { Route as SessoesSessionIdRouteImport } from './routes/sessoes.$sessionId'
 
@@ -24,20 +25,26 @@ const JogadoresRoute = JogadoresRouteImport.update({
   path: '/jogadores',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SessoesIndexRoute = SessoesIndexRouteImport.update({
-  id: '/sessoes/',
-  path: '/sessoes/',
+const SessoesRoute = SessoesRouteImport.update({
+  id: '/sessoes',
+  path: '/sessoes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SessoesIndexRoute = SessoesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SessoesRoute,
+} as any)
 const SessoesSessionIdRoute = SessoesSessionIdRouteImport.update({
-  id: '/sessoes/$sessionId',
-  path: '/sessoes/$sessionId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => SessoesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jogadores': typeof JogadoresRoute
+  '/sessoes': typeof SessoesRouteWithChildren
   '/sessoes/$sessionId': typeof SessoesSessionIdRoute
   '/sessoes/': typeof SessoesIndexRoute
 }
@@ -51,22 +58,29 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/jogadores': typeof JogadoresRoute
+  '/sessoes': typeof SessoesRouteWithChildren
   '/sessoes/$sessionId': typeof SessoesSessionIdRoute
   '/sessoes/': typeof SessoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jogadores' | '/sessoes/$sessionId' | '/sessoes/'
+  fullPaths:
+    '/' | '/jogadores' | '/sessoes' | '/sessoes/$sessionId' | '/sessoes/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/jogadores' | '/sessoes/$sessionId' | '/sessoes'
-  id: '__root__' | '/' | '/jogadores' | '/sessoes/$sessionId' | '/sessoes/'
+  id:
+    | '__root__'
+    | '/'
+    | '/jogadores'
+    | '/sessoes'
+    | '/sessoes/$sessionId'
+    | '/sessoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JogadoresRoute: typeof JogadoresRoute
-  SessoesSessionIdRoute: typeof SessoesSessionIdRoute
-  SessoesIndexRoute: typeof SessoesIndexRoute
+  SessoesRoute: typeof SessoesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -85,28 +99,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JogadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sessoes': {
+      id: '/sessoes'
+      path: '/sessoes'
+      fullPath: '/sessoes'
+      preLoaderRoute: typeof SessoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sessoes/': {
       id: '/sessoes/'
-      path: '/sessoes'
+      path: '/'
       fullPath: '/sessoes/'
       preLoaderRoute: typeof SessoesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SessoesRoute
     }
     '/sessoes/$sessionId': {
       id: '/sessoes/$sessionId'
-      path: '/sessoes/$sessionId'
+      path: '/$sessionId'
       fullPath: '/sessoes/$sessionId'
       preLoaderRoute: typeof SessoesSessionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SessoesRoute
     }
   }
 }
 
+interface SessoesRouteChildren {
+  SessoesSessionIdRoute: typeof SessoesSessionIdRoute
+  SessoesIndexRoute: typeof SessoesIndexRoute
+}
+
+const SessoesRouteChildren: SessoesRouteChildren = {
+  SessoesSessionIdRoute: SessoesSessionIdRoute,
+  SessoesIndexRoute: SessoesIndexRoute,
+}
+
+const SessoesRouteWithChildren =
+  SessoesRoute._addFileChildren(SessoesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JogadoresRoute: JogadoresRoute,
-  SessoesSessionIdRoute: SessoesSessionIdRoute,
-  SessoesIndexRoute: SessoesIndexRoute,
+  SessoesRoute: SessoesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
