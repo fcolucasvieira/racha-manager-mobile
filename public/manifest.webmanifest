@@ -1,0 +1,10 @@
+{
+  "name": "Racha Manager",
+  "short_name": "Racha",
+  "description": "Organize e gerencie partidas de futebol amador.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0F12",
+  "theme_color": "#FF5500",
+  "icons": [{ "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }]
+}
