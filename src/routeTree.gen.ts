@@ -10,33 +10,77 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JogadoresRouteImport } from './routes/jogadores'
+import { Route as SessoesRouteImport } from './routes/sessoes'
+import { Route as SessoesIndexRouteImport } from './routes/sessoes.index'
+import { Route as SessoesSessionIdRouteImport } from './routes/sessoes.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JogadoresRoute = JogadoresRouteImport.update({
+  id: '/jogadores',
+  path: '/jogadores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessoesRoute = SessoesRouteImport.update({
+  id: '/sessoes',
+  path: '/sessoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessoesIndexRoute = SessoesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SessoesRoute,
+} as any)
+const SessoesSessionIdRoute = SessoesSessionIdRouteImport.update({
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => SessoesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/jogadores': typeof JogadoresRoute
+  '/sessoes': typeof SessoesRouteWithChildren
+  '/sessoes/$sessionId': typeof SessoesSessionIdRoute
+  '/sessoes/': typeof SessoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/jogadores': typeof JogadoresRoute
+  '/sessoes/$sessionId': typeof SessoesSessionIdRoute
+  '/sessoes': typeof SessoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/jogadores': typeof JogadoresRoute
+  '/sessoes': typeof SessoesRouteWithChildren
+  '/sessoes/$sessionId': typeof SessoesSessionIdRoute
+  '/sessoes/': typeof SessoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/jogadores' | '/sessoes' | '/sessoes/$sessionId' | '/sessoes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/jogadores' | '/sessoes/$sessionId' | '/sessoes'
+  id:
+    | '__root__'
+    | '/'
+    | '/jogadores'
+    | '/sessoes'
+    | '/sessoes/$sessionId'
+    | '/sessoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  JogadoresRoute: typeof JogadoresRoute
+  SessoesRoute: typeof SessoesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +92,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jogadores': {
+      id: '/jogadores'
+      path: '/jogadores'
+      fullPath: '/jogadores'
+      preLoaderRoute: typeof JogadoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessoes': {
+      id: '/sessoes'
+      path: '/sessoes'
+      fullPath: '/sessoes'
+      preLoaderRoute: typeof SessoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessoes/': {
+      id: '/sessoes/'
+      path: '/'
+      fullPath: '/sessoes/'
+      preLoaderRoute: typeof SessoesIndexRouteImport
+      parentRoute: typeof SessoesRoute
+    }
+    '/sessoes/$sessionId': {
+      id: '/sessoes/$sessionId'
+      path: '/$sessionId'
+      fullPath: '/sessoes/$sessionId'
+      preLoaderRoute: typeof SessoesSessionIdRouteImport
+      parentRoute: typeof SessoesRoute
+    }
   }
 }
 
+interface SessoesRouteChildren {
+  SessoesSessionIdRoute: typeof SessoesSessionIdRoute
+  SessoesIndexRoute: typeof SessoesIndexRoute
+}
+
+const SessoesRouteChildren: SessoesRouteChildren = {
+  SessoesSessionIdRoute: SessoesSessionIdRoute,
+  SessoesIndexRoute: SessoesIndexRoute,
+}
+
+const SessoesRouteWithChildren =
+  SessoesRoute._addFileChildren(SessoesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  JogadoresRoute: JogadoresRoute,
+  SessoesRoute: SessoesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
